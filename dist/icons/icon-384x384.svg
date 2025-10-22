@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 384" width="384" height="384">
+  <defs>
+    <linearGradient id="bg-gradient-384" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5a3c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5d3a28;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="robot-gradient-384" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4a574;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a67c52;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow-384">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  
+  <rect width="384" height="384" rx="83.47826086956522" fill="url(#bg-gradient-384)"/>
+  
+  <g filter="url(#shadow-384)">
+    <rect x="117.12" y="104.83200000000001" width="149.76" height="149.76" rx="22.656" fill="url(#robot-gradient-384)" stroke="#3d2414" stroke-width="3"/>
+    
+    <circle cx="162.048" cy="150.144" r="18.816000000000003" fill="#1e90ff" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="221.952" cy="150.144" r="18.816000000000003" fill="#1e90ff" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    
+    <circle cx="168.192" cy="144" r="6.144" fill="#fff" opacity="0.8"/>
+    <circle cx="228.096" cy="144" r="6.144" fill="#fff" opacity="0.8"/>
+    
+    <line x1="192" y1="104.83200000000001" x2="192" y2="74.88" stroke="#a67c52" stroke-width="4.5017584994138335" stroke-linecap="round"/>
+    <circle cx="192" cy="71.424" r="8.832" fill="#ff6b6b">
+      <animate attributeName="fill" values="#ff6b6b;#ff4757;#ff6b6b" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    
+    <rect x="147.072" y="202.368" width="89.85600000000001" height="29.951999999999998" rx="7.68" fill="#3d2414" opacity="0.6"/>
+    <line x1="154.368" y1="210.048" x2="154.368" y2="225.024" stroke="#8b5a3c" stroke-width="1.5"/>
+    <line x1="169.344" y1="210.048" x2="169.344" y2="225.024" stroke="#8b5a3c" stroke-width="1.5"/>
+    <line x1="184.32" y1="210.048" x2="184.32" y2="225.024" stroke="#8b5a3c" stroke-width="1.5"/>
+    <line x1="199.68" y1="210.048" x2="199.68" y2="225.024" stroke="#8b5a3c" stroke-width="1.5"/>
+    <line x1="214.656" y1="210.048" x2="214.656" y2="225.024" stroke="#8b5a3c" stroke-width="1.5"/>
+    <line x1="229.632" y1="210.048" x2="229.632" y2="225.024" stroke="#8b5a3c" stroke-width="1.5"/>
+  </g>
+  
+  <text x="192" y="292.608" font-family="Arial, sans-serif" font-size="36.096000000000004" font-weight="bold" fill="#d4a574" text-anchor="middle">BabyAGI</text>
+  <text x="192" y="322.56" font-family="Arial, sans-serif" font-size="18.048000000000002" fill="#a67c52" text-anchor="middle">AI Agent</text>
+</svg>

@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Copy of BabyAGI PWA",
+  "description": "A Progressive Web App simulating an autonomous AI agent that breaks down objectives into subtasks, executes them iteratively, and learns from results to achieve goals intelligently.",
+  "requestFramePermissions": []
+}
