@@ -4,8 +4,8 @@
   "description": "State-of-the-art autonomous AI agent framework for task planning, reasoning, and execution",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#2d2013",
-  "theme_color": "#8b5a3c",
+  "background_color": "#6366f1",
+  "theme_color": "#6366f1",
   "orientation": "any",
   "scope": "/",
   "icons": [

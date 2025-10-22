@@ -1,55 +1,74 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
+    <!-- Modern gradient background -->
     <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#8b5a3c;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#5d3a28;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4f46e5;stop-opacity:1" />
     </linearGradient>
+    
+    <!-- Robot gradient -->
     <linearGradient id="robot-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#d4a574;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#a67c52;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e0e7ff;stop-opacity:1" />
     </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Shadow -->
     <filter id="shadow">
-      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.5"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.25"/>
     </filter>
   </defs>
   
-  <!-- Background with rounded corners -->
+  <!-- Background with rounded corners (modern) -->
   <rect width="512" height="512" rx="110" fill="url(#bg-gradient)"/>
   
-  <!-- Robot head with beveled effect -->
+  <!-- Decorative circles -->
+  <circle cx="100" cy="100" r="40" fill="#fff" opacity="0.1"/>
+  <circle cx="420" cy="420" r="60" fill="#fff" opacity="0.1"/>
+  
+  <!-- Robot icon (modern, flat design) -->
   <g filter="url(#shadow)">
-    <!-- Main head -->
-    <rect x="156" y="140" width="200" height="200" rx="30" fill="url(#robot-gradient)" stroke="#3d2414" stroke-width="4"/>
+    <!-- Robot head -->
+    <rect x="156" y="140" width="200" height="200" rx="40" fill="url(#robot-gradient)"/>
     
-    <!-- Eyes with glow effect -->
-    <circle cx="216" cy="200" r="25" fill="#1e90ff" opacity="0.9">
-      <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite"/>
+    <!-- Eyes (modern circular) -->
+    <circle cx="216" cy="210" r="20" fill="#6366f1">
+      <animate attributeName="r" values="20;22;20" dur="2s" repeatCount="indefinite"/>
     </circle>
-    <circle cx="296" cy="200" r="25" fill="#1e90ff" opacity="0.9">
-      <animate attributeName="opacity" values="0.9;1;0.9" dur="2s" repeatCount="indefinite"/>
+    <circle cx="296" cy="210" r="20" fill="#6366f1">
+      <animate attributeName="r" values="20;22;20" dur="2s" repeatCount="indefinite"/>
     </circle>
     
     <!-- Eye highlights -->
-    <circle cx="224" cy="192" r="8" fill="#fff" opacity="0.8"/>
-    <circle cx="304" cy="192" r="8" fill="#fff" opacity="0.8"/>
+    <circle cx="222" cy="205" r="6" fill="#fff" opacity="0.9"/>
+    <circle cx="302" cy="205" r="6" fill="#fff" opacity="0.9"/>
     
-    <!-- Antenna -->
-    <line x1="256" y1="140" x2="256" y2="100" stroke="#a67c52" stroke-width="6" stroke-linecap="round"/>
-    <circle cx="256" cy="95" r="12" fill="#ff6b6b">
-      <animate attributeName="fill" values="#ff6b6b;#ff4757;#ff6b6b" dur="1.5s" repeatCount="indefinite"/>
+    <!-- Antenna (modern minimal) -->
+    <line x1="256" y1="140" x2="256" y2="100" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
+    <circle cx="256" cy="92" r="14" fill="#10b981" filter="url(#glow)">
+      <animate attributeName="opacity" values="1;0.6;1" dur="1.5s" repeatCount="indefinite"/>
     </circle>
     
-    <!-- Mouth/speaker grille -->
-    <rect x="196" y="270" width="120" height="40" rx="10" fill="#3d2414" opacity="0.6"/>
-    <line x1="206" y1="280" x2="206" y2="300" stroke="#8b5a3c" stroke-width="2"/>
-    <line x1="226" y1="280" x2="226" y2="300" stroke="#8b5a3c" stroke-width="2"/>
-    <line x1="246" y1="280" x2="246" y2="300" stroke="#8b5a3c" stroke-width="2"/>
-    <line x1="266" y1="280" x2="266" y2="300" stroke="#8b5a3c" stroke-width="2"/>
-    <line x1="286" y1="280" x2="286" y2="300" stroke="#8b5a3c" stroke-width="2"/>
-    <line x1="306" y1="280" x2="306" y2="300" stroke="#8b5a3c" stroke-width="2"/>
+    <!-- Smile/Interface line -->
+    <path d="M 196 270 Q 256 300 316 270" stroke="#6366f1" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.8"/>
+    
+    <!-- Decorative dots (modern tech feel) -->
+    <circle cx="176" cy="250" r="4" fill="#6366f1" opacity="0.4"/>
+    <circle cx="336" cy="250" r="4" fill="#6366f1" opacity="0.4"/>
   </g>
   
-  <!-- Text label -->
-  <text x="256" y="390" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#d4a574" text-anchor="middle">BabyAGI</text>
-  <text x="256" y="430" font-family="Arial, sans-serif" font-size="24" fill="#a67c52" text-anchor="middle">Autonomous Agent</text>
+  <!-- Baby emoji -->
+  <text x="256" y="380" font-size="80" text-anchor="middle">👶</text>
+  
+  <!-- Text label (modern typography) -->
+  <text x="256" y="440" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="700" fill="#ffffff" text-anchor="middle" opacity="0.95">BabyAGI</text>
+  <text x="256" y="470" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="500" fill="#e0e7ff" text-anchor="middle" opacity="0.8">AI Agent</text>
 </svg>

@@ -10,10 +10,10 @@
     <meta name="description" content="State-of-the-art autonomous AI agent framework for task planning, reasoning, and execution with OpenRouter API support">
     
     <!-- PWA Theme Colors -->
-    <meta name="theme-color" content="#8b5a3c">
-    <meta name="msapplication-TileColor" content="#2d2013">
-    <meta name="msapplication-navbutton-color" content="#8b5a3c">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="msapplication-TileColor" content="#4f46e5">
+    <meta name="msapplication-navbutton-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <!-- PWA App Capabilities -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -66,14 +66,14 @@
         min-height: 100vh;
       }
       
-      /* Loading screen */
+      /* Loading screen - Modern design */
       .app-loading {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #2d2013 0%, #1a1410 50%, #2a1f18 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -82,16 +82,39 @@
       
       .app-loading-content {
         text-align: center;
+        animation: fadeInUp 0.5s ease-out;
+      }
+      
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .app-loading-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: bounce 2s ease-in-out infinite;
+      }
+      
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
       }
       
       .app-loading-spinner {
-        width: 60px;
-        height: 60px;
-        border: 6px solid rgba(212, 165, 116, 0.3);
-        border-top: 6px solid #d4a574;
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top: 4px solid #ffffff;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 24px;
       }
       
       @keyframes spin {
@@ -99,11 +122,20 @@
         100% { transform: rotate(360deg); }
       }
       
-      .app-loading-text {
-        color: #d4a574;
-        font-size: 24px;
-        font-weight: bold;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      .app-loading-title {
+        color: #ffffff;
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        font-family: system-ui, -apple-system, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      
+      .app-loading-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        font-weight: 500;
+        font-family: system-ui, -apple-system, sans-serif;
       }
     </style>
 </head>
@@ -111,8 +143,10 @@
     <!-- Loading Screen -->
     <div class="app-loading" id="app-loading">
       <div class="app-loading-content">
+        <div class="app-loading-icon">👶</div>
         <div class="app-loading-spinner"></div>
-        <div class="app-loading-text">👶 BabyAGI II</div>
+        <div class="app-loading-title">BabyAGI II</div>
+        <div class="app-loading-subtitle">Autonomous AI Agent</div>
       </div>
     </div>
     
