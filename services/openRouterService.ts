@@ -3,42 +3,91 @@ import { ITask, ITaskHistoryEntry } from '../types';
 // OpenRouter API configuration
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-// Free models available on OpenRouter
+// Free models available on OpenRouter - suitable for AI agent tasks
 export const FREE_MODELS = [
+  // Recommended models for complex tasks
   {
     id: 'meta-llama/llama-3.2-3b-instruct:free',
     name: 'Meta Llama 3.2 3B Instruct (Free)',
-    description: 'Fast and efficient, good for quick tasks'
-  },
-  {
-    id: 'meta-llama/llama-3.2-1b-instruct:free',
-    name: 'Meta Llama 3.2 1B Instruct (Free)',
-    description: 'Lightweight model for simple tasks'
+    description: '⭐ Recommended - Fast and efficient, excellent for agent tasks'
   },
   {
     id: 'google/gemma-2-9b-it:free',
     name: 'Google Gemma 2 9B IT (Free)',
-    description: 'Google\'s instruction-tuned model'
-  },
-  {
-    id: 'microsoft/phi-3-mini-128k-instruct:free',
-    name: 'Microsoft Phi-3 Mini 128K (Free)',
-    description: 'Efficient model with long context'
+    description: '⭐ Recommended - Strong reasoning, great for planning'
   },
   {
     id: 'mistralai/mistral-7b-instruct:free',
     name: 'Mistral 7B Instruct (Free)',
-    description: 'Powerful open-source model'
+    description: '⭐ Recommended - Balanced performance for all tasks'
   },
+  
+  // High-performance models (may have rate limits)
   {
     id: 'nousresearch/hermes-3-llama-3.1-405b:free',
     name: 'Hermes 3 Llama 3.1 405B (Free)',
-    description: 'Large powerful model (limited availability)'
+    description: '🚀 Most powerful - Best quality but limited availability'
+  },
+  {
+    id: 'meta-llama/llama-3.1-70b-instruct:free',
+    name: 'Meta Llama 3.1 70B Instruct (Free)',
+    description: '🚀 Very powerful - Excellent for complex reasoning'
+  },
+  {
+    id: 'meta-llama/llama-3.1-8b-instruct:free',
+    name: 'Meta Llama 3.1 8B Instruct (Free)',
+    description: 'Strong performance with good speed'
+  },
+  
+  // Specialized models
+  {
+    id: 'microsoft/phi-3-mini-128k-instruct:free',
+    name: 'Microsoft Phi-3 Mini 128K (Free)',
+    description: '📚 Long context (128K) - Great for analyzing large texts'
+  },
+  {
+    id: 'microsoft/phi-3-medium-128k-instruct:free',
+    name: 'Microsoft Phi-3 Medium 128K (Free)',
+    description: '📚 Long context (128K) - Better reasoning than mini'
   },
   {
     id: 'qwen/qwen-2-7b-instruct:free',
     name: 'Qwen 2 7B Instruct (Free)',
-    description: 'Alibaba\'s efficient model'
+    description: 'Alibaba model - Strong in multilingual tasks'
+  },
+  {
+    id: 'qwen/qwen-2.5-7b-instruct:free',
+    name: 'Qwen 2.5 7B Instruct (Free)',
+    description: 'Latest Qwen - Improved reasoning and coding'
+  },
+  
+  // Lightweight models for quick tasks
+  {
+    id: 'meta-llama/llama-3.2-1b-instruct:free',
+    name: 'Meta Llama 3.2 1B Instruct (Free)',
+    description: '⚡ Ultra-fast - Best for simple, quick tasks'
+  },
+  {
+    id: 'google/gemma-7b-it:free',
+    name: 'Google Gemma 7B IT (Free)',
+    description: 'Efficient Google model for general tasks'
+  },
+  
+  // Additional capable models
+  {
+    id: 'liquid/lfm-40b:free',
+    name: 'Liquid LFM 40B (Free)',
+    description: 'Liquid AI model - Good for general reasoning'
+  },
+  {
+    id: 'openchat/openchat-7b:free',
+    name: 'OpenChat 7B (Free)',
+    description: 'Fine-tuned for conversational tasks'
+  },
+  {
+    id: 'mythomist/mythomist-7b:free',
+    name: 'MythoMist 7B (Free)',
+    description: 'Creative and analytical tasks'
   }
 ];
 
