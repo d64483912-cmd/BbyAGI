@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ITask, ITaskHistoryEntry, AgentStatus } from './types';
@@ -11,7 +10,11 @@ import ObjectiveInput from './components/ObjectiveInput';
 import AgentControl from './components/AgentControl';
 import TaskDisplay from './components/TaskDisplay';
 import AgentOutput from './components/AgentOutput';
-import ExecutionIntervalInput from './components/ExecutionIntervalInput'; // Import the new component
+import ExecutionIntervalInput from './components/ExecutionIntervalInput';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+
+const BABYAGI_STATE_KEY = 'babyagi-pwa-state';
 
 const App: React.FC = () => {
   const [objective, setObjective] = useState<string>('');
@@ -24,6 +27,7 @@ const App: React.FC = () => {
   const [executionInterval, setExecutionInterval] = useState<number>(5); // Default to 5 seconds
 
   const isAgentRunningRef = useRef(false);
+  const reportRef = useRef<HTMLDivElement>(null); // Ref for the content to be exported as PDF
 
   // Function to start the agent
   const startAgent = useCallback(async () => {
@@ -75,6 +79,148 @@ const App: React.FC = () => {
     setError(null);
     isAgentRunningRef.current = false;
   }, []);
+
+  // New function to clear all pending tasks
+  const clearAllTasks = useCallback(() => {
+    if (currentTasks.length > 0 || completedTasks.length > 0) {
+      setCurrentTasks([]);
+      setCompletedTasks([]);
+      setAgentStatus(AgentStatus.IDLE);
+      setIsLoading(false);
+      setError(null);
+      isAgentRunningRef.current = false;
+      setAgentOutput('All pending tasks cleared. Agent is idle.');
+    }
+  }, [currentTasks.length, completedTasks.length]);
+
+  // New function to skip the current task
+  const skipCurrentTask = useCallback(() => {
+    if (currentTasks.length > 0 && !isLoading) {
+      setCurrentTasks(prev => prev.slice(1));
+      setIsLoading(false); // Reset isLoading, so useEffect can re-evaluate
+      setAgentOutput('Current task skipped. Moving to the next task...');
+      // If no more tasks, the useEffect will trigger reprioritization or completion.
+      // If agent was paused, it remains paused but with a shorter queue.
+      // If agent was running, the useEffect will naturally pick up the next task (or reprioritize)
+    }
+  }, [currentTasks, isLoading]);
+
+  // Function to save the current agent state to localStorage
+  const saveAgentState = useCallback(() => {
+    try {
+      const stateToSave = {
+        objective,
+        currentTasks,
+        completedTasks,
+        // When saving, set status to IDLE to prevent auto-resuming on load
+        agentStatus: agentStatus === AgentStatus.RUNNING || agentStatus === AgentStatus.PAUSED ? AgentStatus.IDLE : agentStatus,
+        executionInterval,
+      };
+      localStorage.setItem(BABYAGI_STATE_KEY, JSON.stringify(stateToSave));
+      setAgentOutput('Agent state saved successfully!');
+      setError(null);
+    } catch (e: any) {
+      setError(`Failed to save state: ${e.message}`);
+      setAgentOutput('Failed to save agent state.');
+      console.error('Error saving state:', e);
+    }
+  }, [objective, currentTasks, completedTasks, agentStatus, executionInterval]);
+
+  // Function to load agent state from localStorage
+  const loadAgentState = useCallback(() => {
+    if (agentStatus === AgentStatus.RUNNING || agentStatus === AgentStatus.PAUSED) {
+      setError('Cannot load state while agent is running or paused. Please reset first.');
+      return;
+    }
+    try {
+      const savedState = localStorage.getItem(BABYAGI_STATE_KEY);
+      if (!savedState) {
+        setAgentOutput('No saved state found.');
+        setError(null);
+        return;
+      }
+
+      const parsedState = JSON.parse(savedState);
+
+      // Basic validation of loaded state structure
+      if (
+        typeof parsedState.objective !== 'string' ||
+        !Array.isArray(parsedState.currentTasks) ||
+        !Array.isArray(parsedState.completedTasks) ||
+        !Object.values(AgentStatus).includes(parsedState.agentStatus) ||
+        typeof parsedState.executionInterval !== 'number'
+      ) {
+        throw new Error('Invalid or corrupted saved state.');
+      }
+
+      setObjective(parsedState.objective);
+      setCurrentTasks(parsedState.currentTasks);
+      setCompletedTasks(parsedState.completedTasks);
+      // Force status to IDLE on load for safety
+      setAgentStatus(AgentStatus.IDLE);
+      setExecutionInterval(parsedState.executionInterval);
+
+      // Reset transient states
+      setIsLoading(false);
+      setError(null);
+      isAgentRunningRef.current = false;
+      setAgentOutput('Agent state loaded successfully! Click Start to resume.');
+    } catch (e: any) {
+      setError(`Failed to load state: ${e.message}`);
+      setAgentOutput('Failed to load agent state.');
+      console.error('Error loading state:', e);
+    }
+  }, [agentStatus]);
+
+  // Function to generate PDF report
+  const generatePdfReport = useCallback(async () => {
+    if (!reportRef.current) {
+      setError('Report content not found for PDF generation.');
+      console.error('Report ref is null.');
+      return;
+    }
+    setIsLoading(true);
+    setAgentOutput('Generating PDF report...');
+    setError(null);
+
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2, // Increase scale for better resolution
+        useCORS: true, // If any images are loaded from external sources
+        windowWidth: reportRef.current.scrollWidth,
+        windowHeight: reportRef.current.scrollHeight,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for units, 'a4' for page size
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const filename = `BabyAGI_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+      pdf.save(filename);
+      setAgentOutput(`PDF report "${filename}" generated successfully!`);
+    } catch (e: any) {
+      setError(`Failed to generate PDF report: ${e.message}`);
+      setAgentOutput('Failed to generate PDF report.');
+      console.error('Error generating PDF:', e);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
 
   // The core BabyAGI logic, now *not* responsible for scheduling itself
   const runAgentStep = useCallback(async () => {
@@ -157,8 +303,8 @@ const App: React.FC = () => {
   useEffect(() => {
     let loopTimeout: number | undefined;
 
+    // Only schedule if agent is running and not currently busy loading/executing
     if (agentStatus === AgentStatus.RUNNING && !isLoading) {
-      // Determine the delay for the next step
       const delay = executionInterval > 0 ? executionInterval * 1000 : 50; // 50ms for instant progression (UI update)
       const nextTaskDescription = currentTasks[0]?.description || 'No specific task yet';
 
@@ -180,18 +326,26 @@ const App: React.FC = () => {
         clearTimeout(loopTimeout);
       }
     };
-  }, [agentStatus, currentTasks.length, completedTasks.length, isLoading, executionInterval, runAgentStep]);
+  }, [agentStatus, isLoading, executionInterval, runAgentStep, currentTasks.length]); // Added currentTasks.length to re-trigger when tasks change
 
   // Effect to manage `isAgentRunningRef` when `agentStatus` changes from external events (e.g., pause button)
   useEffect(() => {
     isAgentRunningRef.current = agentStatus === AgentStatus.RUNNING;
   }, [agentStatus]);
 
+  const hasPendingTasks = currentTasks.length > 0;
+  const hasActiveObjectiveOrTasks = objective.trim() !== '' || currentTasks.length > 0 || completedTasks.length > 0;
+  const isAgentBusy = isLoading; // Use isLoading to determine if agent is busy
+  const canLoadState = !isAgentBusy && (agentStatus === AgentStatus.IDLE || agentStatus === AgentStatus.COMPLETE || agentStatus === AgentStatus.ERROR);
+  const canSaveState = !isAgentBusy && hasActiveObjectiveOrTasks;
+  const canExportReport = !isAgentBusy && (completedTasks.length > 0 || agentOutput.trim() !== '');
+
+
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-6 font-sans">
+    <div className="min-h-screen bg-gray-900 text-gray-100 py-10 px-6 font-sans">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-center text-purple-400 mb-10 drop-shadow-lg">
-          BabyAGI PWA Simulation 🤖
+        <h1 className="text-5xl font-black text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 mb-10 drop-shadow-2xl">
+          BabyAGI
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -203,7 +357,7 @@ const App: React.FC = () => {
               agentStatus={agentStatus}
               isLoading={isLoading}
             />
-            <ExecutionIntervalInput // New component for interval control
+            <ExecutionIntervalInput
               executionInterval={executionInterval}
               setExecutionInterval={setExecutionInterval}
               agentStatus={agentStatus}
@@ -216,16 +370,88 @@ const App: React.FC = () => {
               resetAgent={resetAgent}
               isLoading={isLoading}
             />
+
+            {/* Task Action Controls Section */}
+            <div className="bg-gray-800 p-6 rounded-lg shadow-xl border-l-4 border-purple-500 flex justify-around items-center gap-4 mt-6">
+              <button
+                onClick={skipCurrentTask}
+                className={`flex-1 py-2 px-4 rounded-md text-white font-semibold transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out ${
+                  hasPendingTasks && !isAgentBusy
+                    ? 'bg-teal-600 hover:bg-teal-700'
+                    : 'bg-gray-600 cursor-not-allowed'
+                } focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 focus:ring-offset-gray-800`}
+                disabled={!hasPendingTasks || isAgentBusy}
+                aria-label="Skip current task"
+              >
+                Skip Current Task
+              </button>
+              <button
+                onClick={clearAllTasks}
+                className={`flex-1 py-2 px-4 rounded-md text-white font-semibold transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out ${
+                  hasActiveObjectiveOrTasks && !isAgentBusy
+                    ? 'bg-indigo-600 hover:bg-indigo-700'
+                    : 'bg-gray-600 cursor-not-allowed'
+                } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800`}
+                disabled={!hasActiveObjectiveOrTasks || isAgentBusy}
+                aria-label="Clear all tasks and reset agent"
+              >
+                Clear All Tasks
+              </button>
+            </div>
+
+            {/* State Management Controls Section */}
+            <div className="bg-gray-800 p-6 rounded-lg shadow-xl border-l-4 border-purple-500 flex justify-around items-center gap-4 mt-6">
+              <button
+                onClick={saveAgentState}
+                className={`flex-1 py-2 px-4 rounded-md text-white font-semibold transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out ${
+                  canSaveState
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-gray-600 cursor-not-allowed'
+                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800`}
+                disabled={!canSaveState}
+                aria-label="Save current agent state"
+              >
+                Save State
+              </button>
+              <button
+                onClick={loadAgentState}
+                className={`flex-1 py-2 px-4 rounded-md text-white font-semibold transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out ${
+                  canLoadState
+                    ? 'bg-gray-600 hover:bg-gray-700'
+                    : 'bg-gray-700 cursor-not-allowed'
+                } focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800`}
+                disabled={!canLoadState}
+                aria-label="Load previously saved agent state"
+              >
+                Load State
+              </button>
+            </div>
+
+            {/* Report Controls Section */}
+            <div className="bg-gray-800 p-6 rounded-lg shadow-xl border-l-4 border-purple-500 flex justify-center items-center gap-4 mt-6">
+              <button
+                onClick={generatePdfReport}
+                className={`flex-1 py-2 px-4 rounded-md text-white font-semibold transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out ${
+                  canExportReport
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-gray-600 cursor-not-allowed'
+                } focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800`}
+                disabled={!canExportReport}
+                aria-label="Export agent activity report as PDF"
+              >
+                Export Report (PDF)
+              </button>
+            </div>
+
           </div>
-          <div className="lg:col-span-2">
+          {/* Content to be captured for PDF */}
+          <div className="lg:col-span-2 space-y-6" ref={reportRef}>
             <TaskDisplay
               objective={objective}
               currentTask={currentTasks[0] || null}
               pendingTasks={currentTasks.slice(1)}
               isLoading={isLoading}
             />
-          </div>
-          <div className="lg:col-span-3">
             <AgentOutput
               agentOutput={agentOutput}
               taskHistory={completedTasks}

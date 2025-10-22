@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AgentStatus } from '../types';
 
@@ -27,7 +26,7 @@ const ExecutionIntervalInput: React.FC<ExecutionIntervalInputProps> = ({
   };
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+    <div className="bg-gray-800 p-6 rounded-lg shadow-xl border-l-4 border-purple-500 mb-6">
       <h2 className="text-xl font-semibold text-gray-100 mb-4">Task Execution Interval</h2>
       <label htmlFor="execution-interval" className="block text-gray-300 text-sm font-medium mb-2" aria-live="polite">
         Seconds between tasks (0 for instant progression):

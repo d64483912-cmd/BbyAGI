@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AgentStatus } from '../types';
 
@@ -20,7 +19,7 @@ const ObjectiveInput: React.FC<ObjectiveInputProps> = ({
   const isDisabled = isLoading || agentStatus === AgentStatus.RUNNING || agentStatus === AgentStatus.PAUSED;
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+    <div className="bg-gray-800 p-6 rounded-lg shadow-xl border-l-4 border-purple-500 mb-6">
       <h2 className="text-xl font-semibold text-gray-100 mb-4">Set Agent Objective</h2>
       <input
         type="text"
@@ -32,7 +31,7 @@ const ObjectiveInput: React.FC<ObjectiveInputProps> = ({
       />
       <button
         onClick={startAgent}
-        className={`w-full py-3 px-6 rounded-md text-white font-semibold transition-colors duration-200 ${
+        className={`w-full py-3 px-6 rounded-md text-white font-semibold transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out ${
           objective.trim() === '' || isDisabled
             ? 'bg-gray-600 cursor-not-allowed'
             : 'bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800'

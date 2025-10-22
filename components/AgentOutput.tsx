@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { ITaskHistoryEntry } from '../types';
 
 interface AgentOutputProps {
@@ -15,21 +14,31 @@ const AgentOutput: React.FC<AgentOutputProps> = ({
   isLoading,
   error,
 }) => {
+  const [historyFilter, setHistoryFilter] = useState<string>('');
+
+  const filteredTaskHistory = taskHistory.filter(entry =>
+    entry.taskDescription.toLowerCase().includes(historyFilter.toLowerCase()) ||
+    entry.result.toLowerCase().includes(historyFilter.toLowerCase())
+  );
+
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+    <div className="bg-gray-800 p-6 rounded-lg shadow-xl border-l-4 border-purple-500">
       <h2 className="text-xl font-semibold text-gray-100 mb-4">Agent Output</h2>
 
       {isLoading && (
-        <div className="flex items-center text-blue-400 mb-4">
+        <div className="flex items-center text-blue-400 mb-4 font-bold text-lg">
           <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-3"></span>
           Processing...
         </div>
       )}
 
       {error && (
-        <div className="bg-red-900 text-red-100 p-3 rounded-md mb-4 border border-red-700">
-          <p className="font-semibold">Error:</p>
-          <p>{error}</p>
+        <div className="bg-red-950 text-red-100 p-3 rounded-md mb-4 border-l-4 border-red-500 shadow-md flex items-center">
+          <span className="text-xl mr-2">⚠️</span>
+          <div>
+            <p className="font-semibold">Error:</p>
+            <p>{error}</p>
+          </div>
         </div>
       )}
 
@@ -42,10 +51,18 @@ const AgentOutput: React.FC<AgentOutputProps> = ({
 
       <div>
         <h3 className="text-lg font-medium text-gray-300 mb-2">Task History:</h3>
-        {taskHistory.length > 0 ? (
+        <input
+          type="text"
+          className="w-full p-3 rounded-md bg-gray-700 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-400 mb-4"
+          placeholder="Filter task history by task or result..."
+          value={historyFilter}
+          onChange={(e) => setHistoryFilter(e.target.value)}
+          aria-label="Filter task history by task or result"
+        />
+        {filteredTaskHistory.length > 0 ? (
           <div className="space-y-4">
-            {taskHistory.slice().reverse().map((entry) => (
-              <div key={entry.id} className="bg-gray-700 p-4 rounded-md border border-gray-600">
+            {filteredTaskHistory.slice().reverse().map((entry) => (
+              <div key={entry.id} className="bg-gray-700 p-4 rounded-md border-l-4 border-purple-400 shadow-sm hover:bg-gray-700 transition-colors duration-150">
                 <p className="text-gray-200 font-semibold mb-1">
                   Task: <span className="text-purple-300">{entry.taskDescription}</span>
                 </p>
@@ -56,7 +73,7 @@ const AgentOutput: React.FC<AgentOutputProps> = ({
           </div>
         ) : (
           <p className="p-3 bg-gray-700 rounded-md text-gray-400 border border-gray-600">
-            No tasks completed yet.
+            {historyFilter ? "No matching tasks in history." : "No tasks completed yet."}
           </p>
         )}
       </div>
