@@ -21,28 +21,25 @@ const AgentControl: React.FC<AgentControlProps> = ({
   const isIdle = agentStatus === AgentStatus.IDLE || agentStatus === AgentStatus.COMPLETE || agentStatus === AgentStatus.ERROR;
 
   return (
-    <div className="card-beveled p-6 flex justify-around items-center mb-6 gap-4">
+    <div className="btn-group">
       <button
         onClick={pauseAgent}
-        className="flex-1 button-tactile"
+        className="btn btn-warning"
         disabled={!isRunning || isLoading}
-        style={(!isRunning || isLoading) ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
       >
         ⏸️ Pause
       </button>
       <button
         onClick={resumeAgent}
-        className="flex-1 button-tactile"
+        className="btn btn-success"
         disabled={!isPaused || isLoading}
-        style={(!isPaused || isLoading) ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
       >
         ▶️ Resume
       </button>
       <button
         onClick={resetAgent}
-        className="flex-1 button-tactile"
+        className="btn btn-secondary"
         disabled={isIdle && !isLoading}
-        style={(isIdle && !isLoading) ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
       >
         🔄 Reset
       </button>

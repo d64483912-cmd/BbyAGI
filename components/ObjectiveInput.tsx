@@ -19,31 +19,31 @@ const ObjectiveInput: React.FC<ObjectiveInputProps> = ({
   const isDisabled = isLoading || agentStatus === AgentStatus.RUNNING || agentStatus === AgentStatus.PAUSED;
 
   return (
-    <div className="card-beveled p-6 mb-6">
-      <h2 className="text-2xl font-bold mb-4" style={{ 
-        color: '#f5e6d3',
-        textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(212,165,116,0.3)'
-      }}>
-        🎯 Set Agent Objective
+    <>
+      <h2 className="text-xl font-bold mb-md">
+        🎯 Set Your Objective
       </h2>
-      <input
-        type="text"
-        className="input-inset w-full mb-4"
-        placeholder="e.g., 'Develop a marketing strategy for a new product'"
+      <textarea
+        className="textarea mb-md"
+        placeholder="e.g., 'Develop a marketing strategy for a new product launch'"
         value={objective}
         onChange={(e) => setObjective(e.target.value)}
         disabled={isDisabled}
-        style={isDisabled ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+        rows={3}
       />
-      <button
-        onClick={startAgent}
-        className="button-tactile w-full"
-        disabled={objective.trim() === '' || isDisabled}
-        style={(objective.trim() === '' || isDisabled) ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-      >
-        {isLoading ? '⏳ Loading...' : '▶️ Start Agent'}
-      </button>
-    </div>
+      <p className="text-sm text-secondary mb-md">
+        Describe what you want the AI agent to accomplish. The agent will break down your objective into tasks and execute them autonomously.
+      </p>
+      {agentStatus === AgentStatus.IDLE && (
+        <button
+          onClick={startAgent}
+          className="btn btn-primary w-full"
+          disabled={objective.trim() === '' || isDisabled}
+        >
+          {isLoading ? '🔄 Initializing...' : '▶️ Start Agent'}
+        </button>
+      )}
+    </>
   );
 };
 

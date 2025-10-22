@@ -26,32 +26,30 @@ const ExecutionIntervalInput: React.FC<ExecutionIntervalInputProps> = ({
   };
 
   return (
-    <div className="card-beveled p-6 mb-6">
-      <h2 className="text-2xl font-bold mb-4" style={{ 
-        color: '#f5e6d3',
-        textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(212,165,116,0.3)'
-      }}>
-        ⏱️ Task Execution Interval
-      </h2>
+    <div className="mt-md">
       <label 
         htmlFor="execution-interval" 
-        className="block text-base font-medium mb-3" 
-        style={{ color: '#e8c9a0', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-        aria-live="polite"
+        className="block text-sm font-semibold mb-sm text-secondary"
       >
-        Seconds between tasks (0 for instant):
+        ⏱️ Task Execution Interval
       </label>
-      <input
-        id="execution-interval"
-        type="number"
-        min="0"
-        className="input-inset w-full"
-        value={executionInterval}
-        onChange={handleChange}
-        disabled={isDisabled}
-        style={isDisabled ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
-        aria-label="Set task execution interval in seconds"
-      />
+      <div className="flex items-center gap-md">
+        <input
+          id="execution-interval"
+          type="number"
+          min="0"
+          max="60"
+          className="input"
+          value={executionInterval}
+          onChange={handleChange}
+          disabled={isDisabled}
+          aria-label="Set task execution interval in seconds"
+        />
+        <span className="text-sm text-secondary whitespace-nowrap">seconds</span>
+      </div>
+      <p className="text-xs text-tertiary mt-sm">
+        Time to wait between tasks (0 = instant execution)
+      </p>
     </div>
   );
 };

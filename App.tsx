@@ -15,7 +15,7 @@ import ExecutionIntervalInput from './components/ExecutionIntervalInput';
 import Settings from './components/Settings';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import './styles/skeuomorphic.css';
+import './styles/mobile-first.css';
 
 const BABYAGI_STATE_KEY = 'babyagi-pwa-state';
 
@@ -354,129 +354,183 @@ const App: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen py-10 px-6 font-sans texture-leather" style={{ background: 'linear-gradient(135deg, #2d2013 0%, #1a1410 50%, #2a1f18 100%)' }}>
-      <div className="max-w-7xl mx-auto">
-        {/* Header with Settings Button */}
-        <div className="flex justify-between items-center mb-10">
-          <h1 className="text-5xl font-black text-center flex-1" style={{ 
-            background: 'linear-gradient(145deg, #d4a574 0%, #8b5a3c 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            textShadow: '0 4px 8px rgba(0,0,0,0.5)',
-            filter: 'drop-shadow(0 2px 4px rgba(212,165,116,0.5))'
-          }}>
-            👶 BabyAGI II
-          </h1>
+    <div className="app-container">
+      {/* Header */}
+      <div className="app-header">
+        <div className="flex items-center justify-between mb-md">
+          <h1 className="app-title">👶 BabyAGI II</h1>
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="button-tactile"
+            className="btn btn-icon btn-secondary"
             aria-label="Open settings"
-            style={{ minWidth: '120px' }}
           >
-            ⚙️ Settings
+            ⚙️
           </button>
         </div>
+        <p className="app-subtitle">Autonomous AI Agent Framework</p>
         
-        {/* Settings Modal */}
-        <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+        {/* Status Badge */}
+        {agentStatus !== AgentStatus.IDLE && (
+          <div className="flex items-center justify-center gap-sm mt-md">
+            <span className={`status-dot ${agentStatus.toLowerCase()}`}></span>
+            <span className="badge badge-primary">
+              {agentStatus === AgentStatus.RUNNING && '🤖 Running'}
+              {agentStatus === AgentStatus.PAUSED && '⏸️ Paused'}
+              {agentStatus === AgentStatus.ERROR && '❌ Error'}
+            </span>
+          </div>
+        )}
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
-            <ObjectiveInput
-              objective={objective}
-              setObjective={setObjective}
-              startAgent={startAgent}
-              agentStatus={agentStatus}
-              isLoading={isLoading}
-            />
+      {/* Settings Modal */}
+      <Settings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+
+      {/* Error Alert */}
+      {error && (
+        <div className="alert alert-error" role="alert">
+          <span>⚠️</span>
+          <div>
+            <p className="font-semibold">Error</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content - Mobile First Single Column */}
+      <div className="space-y-4">
+        {/* Objective Input Card */}
+        <div className="card">
+          <ObjectiveInput
+            objective={objective}
+            setObjective={setObjective}
+            startAgent={startAgent}
+            agentStatus={agentStatus}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Controls Card - Collapsible on Mobile */}
+        {(agentStatus !== AgentStatus.IDLE || objective) && (
+          <div className="card">
+            <h3 className="text-lg font-semibold mb-md">Agent Controls</h3>
+            
+            {/* Primary Controls */}
+            <div className="btn-group mb-md">
+              {agentStatus === AgentStatus.IDLE && (
+                <button
+                  onClick={startAgent}
+                  className="btn btn-success"
+                  disabled={isLoading || !objective}
+                >
+                  ▶️ Start Agent
+                </button>
+              )}
+              {agentStatus === AgentStatus.RUNNING && (
+                <button
+                  onClick={pauseAgent}
+                  className="btn btn-warning"
+                  disabled={isLoading}
+                >
+                  ⏸️ Pause
+                </button>
+              )}
+              {agentStatus === AgentStatus.PAUSED && (
+                <button
+                  onClick={resumeAgent}
+                  className="btn btn-success"
+                  disabled={isLoading}
+                >
+                  ▶️ Resume
+                </button>
+              )}
+              <button
+                onClick={resetAgent}
+                className="btn btn-error"
+                disabled={isLoading && agentStatus === AgentStatus.RUNNING}
+              >
+                🔄 Reset
+              </button>
+            </div>
+
+            {/* Execution Interval */}
             <ExecutionIntervalInput
               executionInterval={executionInterval}
               setExecutionInterval={setExecutionInterval}
               agentStatus={agentStatus}
               isLoading={isLoading}
             />
-            <AgentControl
-              agentStatus={agentStatus}
-              pauseAgent={pauseAgent}
-              resumeAgent={resumeAgent}
-              resetAgent={resetAgent}
-              isLoading={isLoading}
-            />
 
-            {/* Task Action Controls Section */}
-            <div className="card-beveled p-6 flex justify-around items-center gap-4 mt-6">
+            {/* Task Actions */}
+            <div className="btn-group mt-md">
               <button
                 onClick={skipCurrentTask}
-                className="flex-1 button-tactile"
+                className="btn btn-secondary"
                 disabled={!hasPendingTasks || isAgentBusy}
-                aria-label="Skip current task"
-                style={(!hasPendingTasks || isAgentBusy) ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               >
                 ⏭️ Skip Task
               </button>
               <button
                 onClick={clearAllTasks}
-                className="flex-1 button-tactile"
+                className="btn btn-secondary"
                 disabled={!hasActiveObjectiveOrTasks || isAgentBusy}
-                aria-label="Clear all tasks and reset agent"
-                style={(!hasActiveObjectiveOrTasks || isAgentBusy) ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               >
                 🗑️ Clear All
               </button>
             </div>
 
-            {/* State Management Controls Section */}
-            <div className="card-beveled p-6 flex justify-around items-center gap-4 mt-6">
+            {/* State Management */}
+            <div className="btn-group mt-md">
               <button
                 onClick={saveAgentState}
-                className="flex-1 button-tactile"
+                className="btn btn-secondary"
                 disabled={!canSaveState}
-                aria-label="Save current agent state"
-                style={!canSaveState ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               >
-                💾 Save
+                💾 Save State
               </button>
               <button
                 onClick={loadAgentState}
-                className="flex-1 button-tactile"
+                className="btn btn-secondary"
                 disabled={!canLoadState}
-                aria-label="Load previously saved agent state"
-                style={!canLoadState ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
               >
-                📂 Load
+                📂 Load State
               </button>
             </div>
 
-            {/* Report Controls Section */}
-            <div className="card-beveled p-6 flex justify-center items-center gap-4 mt-6">
-              <button
-                onClick={generatePdfReport}
-                className="flex-1 button-tactile"
-                disabled={!canExportReport}
-                aria-label="Export agent activity report as PDF"
-                style={!canExportReport ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
-              >
-                📊 Export PDF
-              </button>
-            </div>
+            {/* Export */}
+            <button
+              onClick={generatePdfReport}
+              className="btn btn-secondary w-full mt-md"
+              disabled={!canExportReport}
+            >
+              📊 Export PDF Report
+            </button>
+          </div>
+        )}
 
-          </div>
-          {/* Content to be captured for PDF */}
-          <div className="lg:col-span-2 space-y-6" ref={reportRef}>
-            <TaskDisplay
-              objective={objective}
-              currentTask={currentTasks[0] || null}
-              pendingTasks={currentTasks.slice(1)}
-              isLoading={isLoading}
-            />
-            <AgentOutput
-              agentOutput={agentOutput}
-              taskHistory={completedTasks}
-              isLoading={isLoading}
-              error={error}
-            />
-          </div>
+        {/* Tasks Display - Main Content */}
+        <div ref={reportRef}>
+          {(currentTasks.length > 0 || completedTasks.length > 0) && (
+            <div className="card">
+              <TaskDisplay
+                objective={objective}
+                currentTask={currentTasks[0] || null}
+                pendingTasks={currentTasks.slice(1)}
+                isLoading={isLoading}
+              />
+            </div>
+          )}
+
+          {/* Agent Output */}
+          {(agentOutput || completedTasks.length > 0) && (
+            <div className="card">
+              <AgentOutput
+                agentOutput={agentOutput}
+                taskHistory={completedTasks}
+                isLoading={isLoading}
+                error={error}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
